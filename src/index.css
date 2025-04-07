@@ -1,0 +1,196 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Original theme variables */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 263 60% 75%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 12 76% 61%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --radius: 0.5rem;
+    
+    /* Sidebar variables */
+    --sidebar-background: 240 10% 3.9%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 263 60% 75%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 263 60% 75%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border selection:bg-cyber-purple/20 selection:text-cyber-purple-light;
+  }
+  
+  body {
+    @apply bg-cyber-black text-foreground antialiased overflow-x-hidden;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239b87f5' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  /* Cyberpunk-specific styles */
+  .cyber-border {
+    @apply relative;
+  }
+  .cyber-border::before {
+    content: '';
+    @apply absolute inset-0 p-[1px] rounded-md z-10 pointer-events-none;
+    background: linear-gradient(90deg, transparent, #9b87f5, transparent);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+  }
+
+  .cyber-panel {
+    @apply relative bg-cyber-dark/75 rounded-md border border-cyber-purple/20 backdrop-blur-sm;
+  }
+  .cyber-panel::after {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyber-purple/40 to-transparent;
+  }
+  .cyber-panel::before {
+    content: '';
+    @apply absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyber-purple/20 to-transparent;
+  }
+
+  .cyber-text-glow {
+    @apply text-cyber-purple-light;
+    text-shadow: 0 0 5px rgba(155, 135, 245, 0.7);
+  }
+
+  .cyber-grid-bg {
+    @apply bg-cyber-grid bg-[length:50px_50px];
+  }
+
+  .scan-line {
+    @apply absolute inset-0 z-10 pointer-events-none overflow-hidden opacity-10;
+  }
+  .scan-line::after {
+    content: '';
+    @apply absolute left-0 right-0 h-[2px] bg-cyber-purple-light animate-scan-line;
+  }
+
+  .data-stream {
+    @apply absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-5;
+  }
+  .data-stream::after {
+    content: '10100110111001010101001100111011100100110110101001101110110010101010100110101010010101100100101010100101010101010100101110100110001101';
+    @apply absolute left-0 right-0 text-xs text-cyber-purple-light whitespace-nowrap animate-data-stream;
+  }
+
+  .glitch-effect {
+    @apply relative;
+  }
+  .glitch-effect::before, .glitch-effect::after {
+    content: attr(data-text);
+    @apply absolute left-0 top-0 w-full h-full;
+  }
+  .glitch-effect::before {
+    @apply text-cyber-blue left-[2px] animate-glitch;
+    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+  }
+  .glitch-effect::after {
+    @apply text-cyber-orange left-[-2px] animate-glitch;
+    clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+  }
+
+  /* Button styles */
+  .cyber-button {
+    @apply relative bg-transparent border border-cyber-purple/50 text-cyber-purple-light py-2 px-4 
+           rounded-sm overflow-hidden transition-all duration-300 
+           hover:bg-cyber-purple/10 hover:border-cyber-purple 
+           focus:outline-none focus:ring-2 focus:ring-cyber-purple/50;
+  }
+  .cyber-button::before {
+    content: '';
+    @apply absolute left-0 top-0 w-0 h-full bg-cyber-purple/10 transition-all duration-300;
+  }
+  .cyber-button:hover::before {
+    @apply w-full;
+  }
+  .cyber-button.cyber-button-primary {
+    @apply border-cyber-purple bg-cyber-purple/20 text-white 
+           hover:bg-cyber-purple/30 hover:border-cyber-purple-light
+           focus:ring-cyber-purple-light;
+  }
+  .cyber-button.cyber-button-accent {
+    @apply border-cyber-orange/70 bg-cyber-orange/10 text-cyber-orange 
+           hover:bg-cyber-orange/20 hover:border-cyber-orange
+           focus:ring-cyber-orange;
+  }
+}
+
+/* Components layer - Reusable cyberpunk components */
+@layer components {
+  .cyber-card {
+    @apply relative bg-cyber-dark/75 rounded-md border border-cyber-purple/20 backdrop-blur-sm p-6 bg-opacity-70;
+  }
+  
+  .cyber-card::after {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyber-purple/40 to-transparent;
+  }
+  
+  .cyber-card::before {
+    content: '';
+    @apply absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyber-purple/20 to-transparent;
+  }
+  
+  .cyber-input {
+    @apply bg-cyber-black/50 border border-cyber-purple/30 text-white rounded-sm px-4 py-2
+           focus:outline-none focus:border-cyber-purple-light focus:ring-1 focus:ring-cyber-purple/30
+           placeholder:text-gray-500 transition-all duration-300;
+  }
+  
+  .cyber-heading {
+    @apply font-bold tracking-wider cyber-text-glow;
+  }
+  
+  .cyber-glow-effect {
+    @apply animate-pulse-glow;
+  }
+
+  .neon-line {
+    @apply h-px bg-gradient-to-r from-transparent via-cyber-purple/60 to-transparent;
+  }
+
+  .neon-line-vertical {
+    @apply w-px h-full bg-gradient-to-b from-transparent via-cyber-purple/60 to-transparent;
+  }
+}
+
+/* Utilities layer - Additional utilities */
+@layer utilities {
+  .text-shadow-glow {
+    text-shadow: 0 0 10px currentColor;
+  }
+  
+  .border-glow {
+    box-shadow: 0 0 5px theme('colors.cyber.purple.light');
+  }
+}
