@@ -1,122 +1,93 @@
-
-import React from 'react';
-import CyberCard from '@/components/CyberCard';
-import { History as HistoryIcon, Search, Calendar, Download, Filter } from 'lucide-react';
-import CyberButton from '@/components/CyberButton';
+import React from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { Link } from "react-router-dom";
+import CyberCard from "@/components/CyberCard";
+import CyberSkeleton from "@/components/CyberSkeleton";
+import CyberScanResult from "@/components/CyberScanResult";
+import { Shield } from "lucide-react";
 
 const History = () => {
-  return (
-    <div className="container mx-auto px-6 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold cyber-text-glow">Activity History</h1>
-        <div className="flex space-x-2">
-          <CyberButton>
-            <div className="flex items-center">
-              <Filter className="mr-2 h-4 w-4" />
-              Filter
-            </div>
-          </CyberButton>
-          <CyberButton variant="accent">
-            <div className="flex items-center">
-              <Download className="mr-2 h-4 w-4" />
-              Export
-            </div>
-          </CyberButton>
+  const { history, loading } = useSelector((state: RootState) => state.scan);
+
+  // Group scans by date
+  const groupedScans = React.useMemo(() => {
+    const groups = history.reduce((acc, scan) => {
+      const date = new Date(scan.timestamp).toLocaleDateString();
+      if (!acc[date]) {
+        acc[date] = [];
+      }
+      acc[date].push(scan);
+      return acc;
+    }, {} as Record<string, typeof history>);
+
+    return Object.entries(groups).sort(
+      (a, b) => new Date(b[0]).getTime() - new Date(a[0]).getTime()
+    );
+  }, [history]);
+
+  if (loading.history) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <CyberSkeleton className="h-8 w-48" />
         </div>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <CyberCard key={i} className="mb-4 p-4">
+            <CyberSkeleton className="h-16" />
+          </CyberCard>
+        ))}
       </div>
-      
-      <CyberCard className="mb-6">
-        <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
-              <input 
-                type="text" 
-                className="cyber-input pl-10 w-full" 
-                placeholder="Search history..."
-              />
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex items-center gap-4 mb-8">
+        <Shield className="h-8 w-8 text-cyber-purple" />
+        <h1 className="text-3xl font-bold cyber-text-glow">Scan History</h1>
+      </div>
+
+      {history.length === 0 ? (
+        <CyberCard className="p-6 text-center">
+          <p className="text-gray-400 mb-4">No scan history available</p>
+          <Link
+            to="/dashboard/scan"
+            className="inline-block text-cyber-purple-light hover:text-cyber-purple transition-colors"
+          >
+            Start your first scan
+          </Link>
+        </CyberCard>
+      ) : (
+        <div className="space-y-8">
+          {groupedScans.map(([date, scans]) => (
+            <div key={date}>
+              <h2 className="text-xl font-semibold mb-4 text-gray-300">
+                {date}
+              </h2>
+              <div className="grid gap-4">
+                {scans.map((scan) => (
+                  <Link
+                    key={scan.id}
+                    to={`/dashboard/scan/${scan.id}`}
+                    className="block transition-transform hover:scale-[1.01]"
+                  >
+                    <CyberScanResult
+                      status={scan.status}
+                      result={scan.target}
+                      details={`Scanned at ${new Date(
+                        scan.timestamp
+                      ).toLocaleTimeString()} • ${
+                        scan.threatType || "Unknown type"
+                      }`}
+                    />
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-          
-          <div className="flex gap-4">
-            <div className="w-48">
-              <select className="cyber-input w-full">
-                <option>All Activities</option>
-                <option>Scans</option>
-                <option>Threats</option>
-                <option>Updates</option>
-              </select>
-            </div>
-            
-            <div className="w-48 flex items-center">
-              <Calendar className="h-4 w-4 text-gray-500 mr-2" />
-              <select className="cyber-input w-full">
-                <option>Last 7 Days</option>
-                <option>Last 30 Days</option>
-                <option>Last 90 Days</option>
-                <option>Custom Range</option>
-              </select>
-            </div>
-          </div>
+          ))}
         </div>
-      </CyberCard>
-      
-      <CyberCard>
-        <h2 className="text-xl font-bold cyber-text-glow mb-4 flex items-center">
-          <HistoryIcon className="mr-2 h-5 w-5 text-cyber-purple-light" />
-          Activity Log
-        </h2>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-cyber-purple/20">
-                <th className="text-left p-4 text-gray-400">Time</th>
-                <th className="text-left p-4 text-gray-400">Activity</th>
-                <th className="text-left p-4 text-gray-400">Details</th>
-                <th className="text-left p-4 text-gray-400">Result</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { time: '2025-04-05 15:32', activity: 'URL Scan', details: 'https://example.com/login', result: 'Safe' },
-                { time: '2025-04-05 14:45', activity: 'File Scan', details: 'report.pdf', result: 'Safe' },
-                { time: '2025-04-05 14:32', activity: 'Malware Detection', details: 'update.exe', result: 'Threat Detected' },
-                { time: '2025-04-05 12:15', activity: 'URL Blocked', details: 'https://suspicious-bank.com', result: 'Threat Blocked' },
-                { time: '2025-04-05 10:45', activity: 'System Scan', details: 'Quick Scan', result: 'Completed' },
-                { time: '2025-04-05 09:30', activity: 'Definitions Update', details: 'Virus Definitions', result: 'Updated' },
-                { time: '2025-04-04 22:13', activity: 'PUP Detection', details: 'free-tool.dmg', result: 'Quarantined' },
-                { time: '2025-04-04 18:05', activity: 'Application Started', details: 'CATCHit Guardian', result: 'Success' },
-                { time: '2025-04-04 15:40', activity: 'Settings Changed', details: 'Scan Schedule: Daily', result: 'Applied' },
-                { time: '2025-04-04 14:22', activity: 'Deep Scan', details: 'Full System Scan', result: 'Completed' },
-              ].map((item, index) => (
-                <tr key={index} className="border-b border-cyber-purple/10 hover:bg-cyber-purple/10">
-                  <td className="p-4 text-gray-400">{item.time}</td>
-                  <td className="p-4">{item.activity}</td>
-                  <td className="p-4 text-gray-400 max-w-xs truncate">{item.details}</td>
-                  <td className="p-4">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      item.result === 'Threat Detected' || item.result === 'Threat Blocked' ? 'bg-red-500/20 text-red-400' : 
-                      item.result === 'Quarantined' ? 'bg-yellow-500/20 text-yellow-400' : 
-                      'bg-green-500/20 text-green-400'
-                    }`}>
-                      {item.result}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        
-        <div className="flex justify-between mt-4">
-          <span className="text-gray-400">Showing 1-10 of 145 entries</span>
-          <div className="flex space-x-2">
-            <CyberButton size="sm">Previous</CyberButton>
-            <CyberButton size="sm">Next</CyberButton>
-          </div>
-        </div>
-      </CyberCard>
+      )}
     </div>
   );
 };

@@ -1,4 +1,13 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { Provider } from "react-redux";
+import { store } from "./store";
+import { useEffect } from "react";
+import { loadPersistedState } from "./store/scanSlice";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/Dashboard";
@@ -10,25 +19,32 @@ import ScanDetail from "./pages/ScanDetail";
 import ThreatDetail from "./pages/ThreatDetail";
 import DashboardLayout from "./layout/DashboardLayout";
 
+// Initialize desktop storage
+store.dispatch(loadPersistedState());
+
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* <Route path="/" element={<Index />} /> */}
+    <Provider store={store}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" />} />
 
-        <Route path="/" element={<DashboardLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="/scan" element={<Scan />} />
-          <Route path="/threats" element={<Threats />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/scan/:id" element={<ScanDetail />} />
-          <Route path="/threat/:id" element={<ThreatDetail />} />
-        </Route>
+          <Route path="/landing" element={<Index />} />
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Router>
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="scan" element={<Scan />} />
+            <Route path="threats" element={<Threats />} />
+            <Route path="history" element={<History />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="scan/:id" element={<ScanDetail />} />
+            <Route path="threat/:id" element={<ThreatDetail />} />
+          </Route>
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+    </Provider>
   );
 }
 

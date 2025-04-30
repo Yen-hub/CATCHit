@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Shield, Menu } from 'lucide-react';
 import CyberButton from './CyberButton';
 import { cn } from '@/lib/utils';
@@ -14,7 +14,7 @@ const CyberHeader = ({ onMenuToggle }: CyberHeaderProps) => {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <Shield className="h-8 w-8 text-cyber-purple animate-pulse-glow" />
             <div className="flex flex-col">
               <span className="text-xl font-bold tracking-wider cyber-text-glow">
@@ -22,11 +22,11 @@ const CyberHeader = ({ onMenuToggle }: CyberHeaderProps) => {
               </span>
               <span className="text-[10px] text-gray-400 -mt-1">CYBER GUARDIAN SHIELD</span>
             </div>
-          </div>
+          </Link>
 
           {/* Navigation - Desktop */}
           <nav className="hidden md:flex items-center space-x-6">
-            {['Home', 'Features', 'How It Works', 'About'].map((item) => (
+            {['Features', 'How It Works', 'About'].map((item) => (
               <a
                 key={item}
                 href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
@@ -35,9 +35,11 @@ const CyberHeader = ({ onMenuToggle }: CyberHeaderProps) => {
                 {item}
               </a>
             ))}
-            <CyberButton variant="primary">
-              Sign In
-            </CyberButton>
+            <Link to="/dashboard">
+              <CyberButton variant="primary">
+                Launch App
+              </CyberButton>
+            </Link>
           </nav>
 
           {/* Mobile Menu Toggle */}

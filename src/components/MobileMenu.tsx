@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import CyberButton from './CyberButton';
@@ -42,7 +42,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
                 </div>
 
                 <nav className="flex flex-col space-y-6">
-                  {['Home', 'Features', 'How It Works', 'About'].map((item) => (
+                  {['Features', 'How It Works', 'About'].map((item) => (
                     <a
                       key={item}
                       href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
@@ -55,9 +55,11 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
                 </nav>
 
                 <div className="mt-12">
-                  <CyberButton variant="primary" className="w-full">
-                    Sign In
-                  </CyberButton>
+                  <Link to="/dashboard" onClick={onClose}>
+                    <CyberButton variant="primary" className="w-full">
+                      Launch App
+                    </CyberButton>
+                  </Link>
                 </div>
               </div>
             </motion.div>

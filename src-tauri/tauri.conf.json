@@ -35,5 +35,14 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "capabilities": {
+    "allowlist": {
+      "http": {
+        "scope": ["http://127.0.0.1:5000/*"],
+        "all": false,
+        "request": true
+      }
+    }
   }
 }
