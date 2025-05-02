@@ -68,6 +68,8 @@ export const scanUrl = createAsyncThunk(
   async (url: string, { dispatch }) => {
     const response = await api.scanUrl(url);
 
+    console.log("URL Response: ", response);
+
     // Create ReadableStream from the response
     const reader = response.body?.getReader();
     const decoder = new TextDecoder();

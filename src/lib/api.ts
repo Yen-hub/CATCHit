@@ -1,4 +1,5 @@
 import { ThreatStatus } from "@/components/CyberScanResult";
+import { invoke } from "@tauri-apps/api/core";
 
 const API_BASE_URL = "http://127.0.0.1:5000";
 
@@ -92,6 +93,11 @@ export const api = {
 
   async scanFile(file: File): Promise<FileResponse> {
     try {
+      // First use Tauri to read the file and get metadata
+      const buffer = await file.arrayBuffer();
+      const fileData = Array.from(new Uint8Array(buffer));
+
+      // Create form data to send to Flask backend
       const formData = new FormData();
       formData.append("file", file);
 
@@ -99,12 +105,13 @@ export const api = {
         method: "POST",
         body: formData,
       });
+
       return handleResponse<FileResponse>(response);
     } catch (error) {
       if (error instanceof ApiError) {
         throw error;
       }
-      throw new Error("Failed to upload file for scanning");
+      throw new Error("Failed to scan file");
     }
   },
 

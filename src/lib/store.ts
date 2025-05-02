@@ -21,57 +21,66 @@ interface PersistedState {
   }[];
 }
 
-class StorageService {
-  private store: Awaited<ReturnType<typeof load>> | null = null;
+let store: Awaited<ReturnType<typeof load>> | null = null;
 
-  async init() {
-    this.store = await load(".settings/storage.json");
-    // Initialize with default values if store is empty
-    const hasData = await this.store.has("state");
-    if (!hasData) {
-      await this.store.set("state", {
-        history: [],
-        threats: [],
-      });
-    }
-    await this.store.save();
+const init = async () => {
+  store = await load(".settings/storage.json");
+  const hasData = await store.has("state");
+  if (!hasData) {
+    await store.set("state", {
+      history: [],
+      threats: [],
+    });
   }
+  await store.save();
+};
 
-  async getState(): Promise<PersistedState> {
-    if (!this.store) await this.init();
-    const state = await this.store?.get<PersistedState>("state");
-    return state || { history: [], threats: [] };
-  }
+const getState = async (): Promise<PersistedState> => {
+  if (!store) await init();
+  const state = await store?.get<PersistedState>("state");
+  return state || { history: [], threats: [] };
+};
 
-  async setState(state: PersistedState): Promise<void> {
-    if (!this.store) await this.init();
-    await this.store?.set("state", state);
-    await this.store?.save();
-  }
+const setState = async (state: PersistedState): Promise<void> => {
+  if (!store) await init();
+  await store?.set("state", state);
+  await store?.save();
+};
 
-  async addToHistory(item: PersistedState["history"][0]): Promise<void> {
-    const state = await this.getState();
-    state.history.unshift(item);
-    await this.setState(state);
-  }
+const addToHistory = async (
+  item: PersistedState["history"][0]
+): Promise<void> => {
+  const state = await getState();
+  state.history.unshift(item);
+  await setState(state);
+};
 
-  async addThreat(threat: PersistedState["threats"][0]): Promise<void> {
-    const state = await this.getState();
-    state.threats.unshift(threat);
-    await this.setState(state);
-  }
+const addThreat = async (
+  threat: PersistedState["threats"][0]
+): Promise<void> => {
+  const state = await getState();
+  state.threats.unshift(threat);
+  await setState(state);
+};
 
-  async clearHistory(): Promise<void> {
-    const state = await this.getState();
-    state.history = [];
-    await this.setState(state);
-  }
+const clearHistory = async (): Promise<void> => {
+  const state = await getState();
+  state.history = [];
+  await setState(state);
+};
 
-  async clearThreats(): Promise<void> {
-    const state = await this.getState();
-    state.threats = [];
-    await this.setState(state);
-  }
-}
+const clearThreats = async (): Promise<void> => {
+  const state = await getState();
+  state.threats = [];
+  await setState(state);
+};
 
-export const storage = new StorageService();
+export const storage = {
+  init,
+  getState,
+  setState,
+  addToHistory,
+  addThreat,
+  clearHistory,
+  clearThreats,
+};
