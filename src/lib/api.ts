@@ -4,28 +4,69 @@ import { invoke } from "@tauri-apps/api/core";
 const API_BASE_URL = "http://127.0.0.1:5000";
 
 interface ScanUrlResponse {
-  url: string;
-  classification: string;
-  is_malicious: boolean;
   confidence: number;
+  features: {
+    fragment_length: number;
+    has_archive: number;
+    has_balanced_slashes: number;
+    has_common_domain: number;
+    has_common_path: number;
+    has_common_tld: number;
+    has_doc: number;
+    has_executable: number;
+    has_https: number;
+    has_port: number;
+    has_redirect: number;
+    has_script: number;
+    has_standard_chars: number;
+    has_standard_port: number;
+    has_standard_scheme: number;
+    has_standard_subdomain: number;
+    has_suspicious_domain: number;
+    has_suspicious_path: number;
+    has_suspicious_query: number;
+    has_suspicious_tld: number;
+    has_suspicious_words: number;
+    is_ip: number;
+    is_short_url: number;
+    length: number;
+    num_digits: number;
+    num_dots: number;
+    num_special: number;
+    path_length: number;
+    query_length: number;
+    subdomain_depth: number;
+  };
+  is_malicious: boolean;
+  type: string;
 }
 
 interface FileResponse {
-  file_name: string;
-  file_size: number;
-  hashes: {
-    md5: string;
-    sha1: string;
-    sha256: string;
+  overall_safe: boolean;
+  scan_details: {
+    ExtensionScanner: {
+      extension: string;
+      is_high_risk: boolean;
+    };
+    MimeTypeScanner: {
+      mime_type: string;
+    };
+    SignatureScanner: {
+      detected_signature: string;
+    };
+    HashScanner: {
+      sha256: string;
+    };
+    ArchiveScanner: {
+      is_archive: boolean;
+      compression_bomb_check?: boolean;
+      nested_archive_check?: boolean;
+    };
+    CodeInjectionScanner: {
+      reason: string;
+    };
   };
-  is_malicious: boolean;
-  scan_results: {
-    check: string;
-    status: string;
-    severity: string;
-    message: string;
-  }[];
-  threat_level: string;
+  warnings: string[];
 }
 
 interface ScanHistoryItem {
@@ -71,19 +112,22 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export const api = {
-  async scanUrl(url: string): Promise<Response> {
+  async scanUrl(url: string): Promise<ScanUrlResponse> {
     try {
+      console.log("Sending URL scan request:", { url });
       const response = await fetch(`${API_BASE_URL}/scan/url`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: "text/event-stream",
         },
         body: JSON.stringify({ url }),
       });
 
-      return handleResponse<Response>(response);
+      const data = await handleResponse<ScanUrlResponse>(response);
+      console.log("URL scan response:", data);
+      return data;
     } catch (error) {
+      console.error("URL scan error:", error);
       if (error instanceof ApiError) {
         throw error;
       }
@@ -93,6 +137,12 @@ export const api = {
 
   async scanFile(file: File): Promise<FileResponse> {
     try {
+      console.log("Sending file scan request:", {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+      });
+
       // First use Tauri to read the file and get metadata
       const buffer = await file.arrayBuffer();
       const fileData = Array.from(new Uint8Array(buffer));
@@ -106,8 +156,11 @@ export const api = {
         body: formData,
       });
 
-      return handleResponse<FileResponse>(response);
+      const data = await handleResponse<FileResponse>(response);
+      console.log("File scan response:", data);
+      return data;
     } catch (error) {
+      console.error("File scan error:", error);
       if (error instanceof ApiError) {
         throw error;
       }

@@ -15,12 +15,24 @@ import { cn } from "@/lib/utils";
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = React.useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [isOnline, setIsOnline] = React.useState(navigator.onLine);
   const location = useLocation();
 
   React.useEffect(() => {
     // Close mobile menu when route changes
     setMobileMenuOpen(false);
   }, [location]);
+
+  React.useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -75,6 +87,35 @@ const DashboardLayout = () => {
                 CYBER GUARDIAN
               </span>
             </div>
+          )}
+        </div>
+
+        <div className="neon-line my-2"></div>
+
+        {/* Online/Offline Indicator */}
+        <div
+          className={cn(
+            "flex items-center gap-2 px-4 py-2",
+            collapsed ? "justify-center" : "justify-start"
+          )}
+          title={isOnline ? "Online" : "Offline"}
+        >
+          <span
+            className={cn(
+              "w-3 h-3 rounded-full",
+              isOnline ? "bg-green-500" : "bg-red-500",
+              "border border-cyber-purple/40"
+            )}
+          ></span>
+          {!collapsed && (
+            <span
+              className={cn(
+                "text-xs font-semibold",
+                isOnline ? "text-green-400" : "text-red-400"
+              )}
+            >
+              {isOnline ? "Online" : "Offline"}
+            </span>
           )}
         </div>
 

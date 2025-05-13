@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { api } from "@/lib/api";
+import { useAppSelector } from "@/store/hooks";
 import CyberCard from "@/components/CyberCard";
 import CyberButton from "@/components/CyberButton";
 import CyberScanResult from "@/components/CyberScanResult";
@@ -33,40 +33,8 @@ const ScanDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [scanData, setScanData] = useState<ScanDetailData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchScanDetails = async () => {
-      try {
-        setLoading(true);
-        const data = await api.getScanDetails(id!);
-        setScanData(data);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description:
-            "Failed to fetch scan details. The scan may have been removed.",
-          variant: "destructive",
-        });
-        setScanData(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchScanDetails();
-    }
-  }, [id, toast]);
-
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 flex justify-center">
-        <Shield className="h-16 w-16 text-cyber-purple animate-pulse" />
-      </div>
-    );
-  }
+  const history = useAppSelector((state) => state.scan.history);
+  const scanData = history.find((scan) => scan.id?.toString() === id);
 
   if (!scanData) {
     return (
@@ -78,7 +46,7 @@ const ScanDetail = () => {
             The scan report you're looking for doesn't exist or has been
             removed.
           </p>
-          <CyberButton onClick={() => navigate("/history")}>
+          <CyberButton onClick={() => navigate("/dashboard/history")}>
             Return to History
           </CyberButton>
         </CyberCard>
@@ -108,7 +76,7 @@ const ScanDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <CyberScanResult
-            status={scanData.status}
+            status={scanData.status as ThreatStatus}
             result={scanData.target}
             details={scanData.details}
             className="mb-6"
@@ -175,7 +143,11 @@ const ScanDetail = () => {
                         .replace(/^./, (str) => str.toUpperCase())}
                     </h4>
                     <p className="text-white">
-                      {Array.isArray(value) ? value.join(", ") : value}
+                      {Array.isArray(value)
+                        ? value.join(", ")
+                        : typeof value === "object" && value !== null
+                        ? JSON.stringify(value)
+                        : String(value)}
                     </p>
                   </div>
                 ))}

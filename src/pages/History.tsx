@@ -1,32 +1,34 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 import { Link } from "react-router-dom";
 import CyberCard from "@/components/CyberCard";
 import CyberSkeleton from "@/components/CyberSkeleton";
 import CyberScanResult from "@/components/CyberScanResult";
 import { Shield } from "lucide-react";
+import { useAppSelector } from "@/store/hooks";
 
 const History = () => {
-  const { history, loading } = useSelector((state: RootState) => state.scan);
+  const history = useAppSelector((state) => state.scan.history);
+  const loading = useAppSelector((state) => state.scan.loading.history);
 
   // Group scans by date
   const groupedScans = React.useMemo(() => {
-    const groups = history.reduce((acc, scan) => {
-      const date = new Date(scan.timestamp).toLocaleDateString();
-      if (!acc[date]) {
-        acc[date] = [];
-      }
-      acc[date].push(scan);
-      return acc;
-    }, {} as Record<string, typeof history>);
-
+    const groups = history.reduce(
+      (acc: Record<string, typeof history>, scan) => {
+        const date = new Date(scan.timestamp).toLocaleDateString();
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push(scan);
+        return acc;
+      },
+      {} as Record<string, typeof history>
+    );
     return Object.entries(groups).sort(
       (a, b) => new Date(b[0]).getTime() - new Date(a[0]).getTime()
     );
   }, [history]);
 
-  if (loading.history) {
+  if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
@@ -47,7 +49,6 @@ const History = () => {
         <Shield className="h-8 w-8 text-cyber-purple" />
         <h1 className="text-3xl font-bold cyber-text-glow">Scan History</h1>
       </div>
-
       {history.length === 0 ? (
         <CyberCard className="p-6 text-center">
           <p className="text-gray-400 mb-4">No scan history available</p>
@@ -73,7 +74,9 @@ const History = () => {
                     className="block transition-transform hover:scale-[1.01]"
                   >
                     <CyberScanResult
-                      status={scan.status}
+                      status={
+                        scan.status as import("@/components/CyberScanResult").ThreatStatus
+                      }
                       result={scan.target}
                       details={`Scanned at ${new Date(
                         scan.timestamp

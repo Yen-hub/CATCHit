@@ -82,7 +82,7 @@ const CyberScanResult = ({
             <div className="mt-4">
               <CyberButton
                 onClick={onIterate}
-                variant="outline"
+                variant="primary"
                 className="w-full"
               >
                 <RotateCw className="w-4 h-4 mr-2" />
@@ -93,7 +93,7 @@ const CyberScanResult = ({
           {status === "completed" && (
             <div className="mt-4 flex justify-end">
               <CyberButton
-                variant="outline"
+                variant="accent"
                 onClick={onIterate}
                 className="ml-2"
               >

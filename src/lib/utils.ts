@@ -12,6 +12,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export async function setupNotifications(): Promise<boolean> {
   let permissionGranted = await isPermissionGranted();
+  console.log("Permission Granted: ", permissionGranted);
   if (!permissionGranted) {
     const permission = await requestPermission();
     permissionGranted = permission === "granted";
@@ -37,4 +38,9 @@ export async function sendWindowsNotification(title: string, body: string) {
     return true;
   }
   return false;
+}
+
+// Utility to check online status
+export function isOnline(): boolean {
+  return typeof navigator !== "undefined" ? navigator.onLine : true;
 }
