@@ -58,4 +58,6 @@ To build a production-ready version of the app for your OS:
 npm run tauri build
 ```
 
+Rename `.env.example` to `.env` and add your virus total API key.
+
 After building, you will find the compiled app in the src-tauri/target/release/bundle directory.

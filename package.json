@@ -1,11 +1,11 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "catchit",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "bunx vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -43,6 +43,7 @@
     "@reduxjs/toolkit": "^2.6.1",
     "@tanstack/react-query": "^5.56.2",
     "@tauri-apps/api": "^2.5.0",
+    "@tauri-apps/plugin-http": "~2",
     "@tauri-apps/plugin-notification": "~2",
     "@tauri-apps/plugin-store": "~2",
     "caniuse-lite": "^1.0.30001712",

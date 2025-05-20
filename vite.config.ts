@@ -39,6 +39,7 @@ export default defineConfig(({ mode }) => ({
     minify: !process.env.TAURI_ENV_DEBUG ? "esbuild" : false,
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_ENV_DEBUG,
+    outDir: "dist",
   },
 
   plugins: [react(), mode === "development" && componentTagger()].filter(

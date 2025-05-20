@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { ThreatStatus } from "@/components/CyberScanResult";
 import { api } from "@/lib/api";
 import { storage } from "@/lib/store";
-
+import { fetch } from "@tauri-apps/plugin-http";
 interface ScanState {
   history: Array<{
     id: string | number;
